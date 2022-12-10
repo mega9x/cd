@@ -19,7 +19,16 @@
             SSN: {{ ent.ssn }}
         </p>
         <p>
-            详细地址和邮编: {{ ent.address }}
+            街道和门牌号: {{ ent.street }}
+        </p>
+        <p>
+            城市: {{ ent.city }}
+        </p>
+        <p>
+            省/州/地方: {{ ent.state }}
+        </p>
+        <p>
+            邮编: {{ ent.zip }}
         </p>
         <p>
             查错网临时邮箱: {{ ent.tempmail }}
