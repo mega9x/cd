@@ -15,8 +15,15 @@
   "dependencies": {
     "chance": "^1.1.9",
     "core-js": "^3.8.3",
+    "cors-anywhere": "^0.4.4",
     "creditcard-generator": "^0.0.7",
     "fakerator": "^0.3.6",
+    "fetch-jsonp": "^1.2.3",
+    "fs": "^0.0.1-security",
+    "https-browserify": "^1.0.0",
+    "net": "^1.0.2",
+    "node-polyfill-webpack-plugin": "^2.0.1",
+    "request": "^2.88.2",
     "vue": "^3.2.13"
   },
   "devDependencies": {

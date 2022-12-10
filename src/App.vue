@@ -9,7 +9,7 @@
       <button v-on:click="gen">生成</button>
     </div>
     <div class="cards" v-for="i in ents" :key="i">
-      <CardCompomentVue :ent="i"></CardCompomentVue>
+      <CardCompomentVue :ent="i"/>
     </div>
   </div>
 
@@ -17,10 +17,12 @@
 
 <script>
 import CardCompomentVue from "./CardCompoment.vue";
-
+const fs = require("fs");
+// import fetchJsonp from "fetch-jsonp";
+// const https = require('https-browserify');
 const Fakerator = require("fakerator");
 const Chance = require("chance");
-const postApi = "https://randommer.io/random-address";
+// const getApi = "https://www.fakexy.com/fake-address-generator-ca";
 const ccardPostApi = "https://dnschecker.org/ajax_files/credit_card_generator.php";
 // const generator = require('creditcard-generator');
 
@@ -29,9 +31,6 @@ export default {
     CardCompomentVue,
   },
   name: 'App',
-  async mounted() {
-
-  },
   data() {
     return {
       isGening: false,
@@ -47,6 +46,7 @@ export default {
     },
     gen: async function() {
         this.isGening = true;
+        this.ents = [];
         for(let i = 1; i <= this.value; i++) {
           let chance = new Chance();
           let entity;
@@ -81,9 +81,13 @@ export default {
               Symbol: false
             }) + "@chacuo.com",
             phone: chance.phone({ formatted: false }),
-            address: rndAddress,
+            street: rndAddress.street,
+            city: rndAddress.city,
+            state: rndAddress.state,
+            zip: rndAddress.zip,
             ssn: chance.ssn({ dashes: false }),
           });
+          await this.sleep(500);
       }
       this.isGening = false;
     },
@@ -100,31 +104,48 @@ export default {
     fetchPost: async function(uri, datas) {
       let response = await fetch(
         uri, {
+            referrerPolicy: 'no-referrer',
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
             body: datas,
+            headers: {
+              Accept: "*/*",
+              "content-type": "application/json; charset=UTF-8",
+              origin: "https://www.meiguodizhi.com",
+              Referer: "https://www.meiguodizhi.com/ca-address/hot-city-Toronto?hl=en",
+              "accept-language": "en,zh-CN;q=0.9,zh;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+              "sec-fetch-site": "no-referrer-when-downgrade"
+            },
+            mode: "cors",
         }
       )
       return response;
     },
+    fetchGet: async function(uri) {
+      let response = await fetch(
+          uri, {
+            method: 'GET',
+            mode: "no-cors"
+          }
+      );
+      return response;
+    },
     getAddress: async function() {
-      let adsData = {
-          number: 1,
-            culture: "en_CA",
+      let address = JSON.parse(fs.readFileSync("./resources/data/address.json"));
+      let num = this.getRandom(0, address.length);
+      let responseJson = address[num];
+      console.log(responseJson)
+      return {
+        street: responseJson.Address,
+        city: responseJson.City,
+        state: responseJson.State,
+        zip: responseJson.Zip_Code,
       };
-      let wwwData = this.objToUrlEncoded(adsData);
-      let response = await this.fetchPost(postApi, wwwData);
-      let text = await response.text();
-      text = text.replace('"]', "").replace('["', "");
-      return text;
     },
     getCreditCard: async function() {
       let ccData = {
         network: "mastercard",
         quantity: "1",
-      }
+      };
       let data = this.objToUrlEncoded(ccData);
       let response = await this.fetchPost(ccardPostApi, data);
       let obj = await response.json();
@@ -149,7 +170,7 @@ export default {
       } else {
         return "male";
       }
-    }
+    },
   },
 }
 </script>
